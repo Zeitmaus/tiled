@@ -33,6 +33,7 @@
 #include "tiled_global.h"
 
 #include "layer.h"
+#include "tile.h"
 
 #include <QString>
 #include <QVector>
@@ -74,6 +75,21 @@ public:
         return tile != other.tile
                 || flippedHorizontally != other.flippedHorizontally
                 || flippedVertically != other.flippedVertically;
+    }
+
+    void toggleFlipHorizontal() { flippedHorizontally = !flippedHorizontally; }
+
+    void toggleFlipVertical() { flippedVertically = !flippedVertically; }
+
+    QImage toImage() const
+    {
+        QImage qi;
+        if (tile) {
+            qi = tile->image().toImage();
+            qi = qi.mirrored(flippedHorizontally,
+                             flippedVertically);
+        }
+        return qi;
     }
 
     Tile *tile;

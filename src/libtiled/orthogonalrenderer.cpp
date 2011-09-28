@@ -208,17 +208,10 @@ void OrthogonalRenderer::drawTileLayer(QPainter *painter,
             if (cell.isEmpty())
                 continue;
 
-            const QPixmap &img = cell.tile->image();
-            const int flipX = cell.flippedHorizontally ? -1 : 1;
-            const int flipY = cell.flippedVertically ? -1 : 1;
-            const int offsetX = cell.flippedHorizontally ? img.width() : 0;
-            const int offsetY = cell.flippedVertically ? 0 : img.height();
-
-            painter->scale(flipX, flipY);
-            painter->drawPixmap(x * tileWidth * flipX - offsetX,
-                                (y + 1) * tileHeight * flipY - offsetY,
-                                img);
-            painter->scale(flipX, flipY);
+            const QImage qimg = cell.toImage();
+            const QPoint qpos(x * tileWidth,
+                             (y + 1)* tileHeight - qimg.height());
+            painter->drawImage(qpos, qimg);
         }
     }
 
