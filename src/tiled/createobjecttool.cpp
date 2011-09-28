@@ -30,7 +30,6 @@
 #include "objectgroup.h"
 #include "objectgroupitem.h"
 #include "preferences.h"
-#include "tile.h"
 #include "utils.h"
 
 #include <QApplication>
@@ -48,17 +47,11 @@ CreateObjectTool::CreateObjectTool(CreationMode mode, QObject *parent)
     , mOverlayObjectGroup(0)
     , mOverlayPolygonObject(0)
     , mOverlayPolygonItem(0)
-    , mTile(0)
     , mMode(mode)
 {
     switch (mMode) {
     case CreateArea:
         Utils::setThemeIcon(this, "insert-object");
-        break;
-
-    case CreateTile:
-        setIcon(QIcon(QLatin1String(":images/24x24/insert-image.png")));
-        Utils::setThemeIcon(this, "insert-image");
         break;
 
     case CreatePolygon:
@@ -90,8 +83,7 @@ CreateObjectTool::~CreateObjectTool()
 
 void CreateObjectTool::deactivate(MapScene *scene)
 {
-    if (mNewMapObjectItem)
-        cancelNewMapObject();
+    if (mNewMapObjectItem) cancelNewMapObject();
 
     AbstractObjectTool::deactivate(scene);
 }
@@ -105,8 +97,7 @@ void CreateObjectTool::mouseMoved(const QPointF &pos,
 {
     AbstractObjectTool::mouseMoved(pos, modifiers);
 
-    if (!mNewMapObjectItem)
-        return;
+    if (!mNewMapObjectItem) return;
 
     const MapRenderer *renderer = mapDocument()->renderer();
 
@@ -127,18 +118,6 @@ void CreateObjectTool::mouseMoved(const QPointF &pos,
             newSize = newSize.toSize();
 
         mNewMapObjectItem->resize(newSize);
-        break;
-    }
-    case CreateTile: {
-        const QSize imgSize = mNewMapObjectItem->mapObject()->tile()->size();
-        const QPointF diff(-imgSize.width() / 2, imgSize.height() / 2);
-        QPointF tileCoords = renderer->pixelToTileCoords(pos + diff);
-
-        if (snapToGrid)
-            tileCoords = tileCoords.toPoint();
-
-        mNewMapObjectItem->mapObject()->setPosition(tileCoords);
-        mNewMapObjectItem->syncWithMapObject();
         break;
     }
     case CreatePolygon:
@@ -164,7 +143,6 @@ void CreateObjectTool::mousePressed(QGraphicsSceneMouseEvent *event)
     if (mNewMapObjectItem) {
         switch (mMode) {
         case CreateArea:
-        case CreateTile:
             if (event->button() == Qt::RightButton)
                 cancelNewMapObject();
             break;
@@ -202,17 +180,7 @@ void CreateObjectTool::mousePressed(QGraphicsSceneMouseEvent *event)
         return;
 
     const MapRenderer *renderer = mapDocument()->renderer();
-    QPointF tileCoords;
-
-    if (mMode == CreateTile) {
-        if (!mTile)
-            return;
-
-        const QPointF diff(-mTile->width() / 2, mTile->height() / 2);
-        tileCoords = renderer->pixelToTileCoords(event->scenePos() + diff);
-    } else {
-        tileCoords = renderer->pixelToTileCoords(event->scenePos());
-    }
+    QPointF tileCoords = renderer->pixelToTileCoords(event->scenePos());
 
     bool snapToGrid = Preferences::instance()->snapToGrid();
     if (event->modifiers() & Qt::ControlModifier)
@@ -227,8 +195,7 @@ void CreateObjectTool::mousePressed(QGraphicsSceneMouseEvent *event)
 void CreateObjectTool::mouseReleased(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() == Qt::LeftButton && mNewMapObjectItem) {
-        if (mMode == CreateArea || mMode == CreateTile)
-            finishNewMapObject();
+        if (mMode == CreateArea) finishNewMapObject();
     }
 }
 
@@ -238,10 +205,6 @@ void CreateObjectTool::languageChanged()
     case CreateArea:
         setName(tr("Insert Object"));
         setShortcut(QKeySequence(tr("O")));
-        break;
-    case CreateTile:
-        setName(tr("Insert Tile"));
-        setShortcut(QKeySequence(tr("T")));
         break;
     case CreatePolygon:
         setName(tr("Insert Polygon"));
@@ -259,14 +222,8 @@ void CreateObjectTool::startNewMapObject(const QPointF &pos,
 {
     Q_ASSERT(!mNewMapObjectItem);
 
-    if (mMode == CreateTile && !mTile)
-        return;
-
     MapObject *newMapObject = new MapObject;
     newMapObject->setPosition(pos);
-
-    if (mMode == CreateTile)
-        newMapObject->setTile(mTile);
 
     if (mMode == CreatePolygon || mMode == CreatePolyline) {
         MapObject::Shape shape = mMode == CreatePolygon ? MapObject::Polygon

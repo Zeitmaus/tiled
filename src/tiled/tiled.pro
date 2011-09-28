@@ -122,7 +122,8 @@ SOURCES += aboutdialog.cpp \
     editpolygontool.cpp \
     selectionrectangle.cpp \
     objecttypes.cpp \
-    objecttypesmodel.cpp
+    objecttypesmodel.cpp \
+    createtileobjecttool.cpp
 
 HEADERS += aboutdialog.h \
     automapper.h \
@@ -212,7 +213,8 @@ HEADERS += aboutdialog.h \
     selectionrectangle.h \
     rangeset.h \
     objecttypes.h \
-    objecttypesmodel.h
+    objecttypesmodel.h \
+    createtileobjecttool.h
 
 FORMS += aboutdialog.ui \
     mainwindow.ui \
@@ -241,3 +243,5 @@ contains(CONFIG, static) {
         qjpeg \
         qtiff
 }
+
+

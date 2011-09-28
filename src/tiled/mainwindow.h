@@ -50,6 +50,7 @@ class MapDocumentActionHandler;
 class MapScene;
 class StampBrush;
 class BucketFillTool;
+class CreateTileObjectTool;
 class TilesetDock;
 class MapView;
 class CommandButton;
@@ -203,6 +204,7 @@ private:
 
     StampBrush *mStampBrush;
     BucketFillTool *mBucketFillTool;
+    CreateTileObjectTool *mCreateTileObjectTool;
 
     ClipboardManager *mClipboardManager;
 

@@ -33,6 +33,7 @@
 #include "addremovetileset.h"
 #include "clipboardmanager.h"
 #include "createobjecttool.h"
+#include "createtileobjecttool.h"
 #include "documentmanager.h"
 #include "editpolygontool.h"
 #include "eraser.h"
@@ -302,8 +303,7 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags)
 
     mStampBrush = new StampBrush(this);
     mBucketFillTool = new BucketFillTool(this);
-    CreateObjectTool *tileObjectsTool = new CreateObjectTool(
-            CreateObjectTool::CreateTile, this);
+    mCreateTileObjectTool = new CreateTileObjectTool(this);
     CreateObjectTool *areaObjectsTool = new CreateObjectTool(
             CreateObjectTool::CreateArea, this);
     CreateObjectTool *polygonObjectsTool = new CreateObjectTool(
@@ -316,7 +316,7 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags)
     connect(mStampBrush, SIGNAL(currentTilesChanged(const TileLayer*)),
             this, SLOT(setStampBrush(const TileLayer*)));
     connect(mTilesetDock, SIGNAL(currentTileChanged(Tile*)),
-            tileObjectsTool, SLOT(setTile(Tile*)));
+            mCreateTileObjectTool, SLOT(setTile(Tile*)));
 
     connect(randomButton, SIGNAL(toggled(bool)),
             mStampBrush, SLOT(setRandom(bool)));
@@ -330,7 +330,7 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags)
     toolManager->registerTool(new ObjectSelectionTool(this));
     toolManager->registerTool(new EditPolygonTool(this));
     toolManager->registerTool(areaObjectsTool);
-    toolManager->registerTool(tileObjectsTool);
+    toolManager->registerTool(mCreateTileObjectTool);
     toolManager->registerTool(polygonObjectsTool);
     toolManager->registerTool(polylineObjectsTool);
 

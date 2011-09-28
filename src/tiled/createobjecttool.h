@@ -25,8 +25,6 @@
 
 namespace Tiled {
 
-class Tile;
-
 namespace Internal {
 
 class MapObjectItem;
@@ -38,7 +36,6 @@ class CreateObjectTool : public AbstractObjectTool
 public:
     enum CreationMode {
         CreateArea,
-        CreateTile,
         CreatePolygon,
         CreatePolyline
     };
@@ -56,13 +53,6 @@ public:
 
     void languageChanged();
 
-public slots:
-    /**
-     * Sets the tile that will be used when the creation mode is
-     * CreateTileObjects.
-     */
-    void setTile(Tile *tile) { mTile = tile; }
-
 private:
     void startNewMapObject(const QPointF &pos, ObjectGroup *objectGroup);
     MapObject *clearNewMapObjectItem();
@@ -73,7 +63,6 @@ private:
     ObjectGroup *mOverlayObjectGroup;
     MapObject *mOverlayPolygonObject;
     MapObjectItem *mOverlayPolygonItem;
-    Tile *mTile;
     CreationMode mMode;
 };
 
