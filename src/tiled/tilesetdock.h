@@ -23,9 +23,10 @@
 #define TILESETDOCK_H
 
 #include <QDockWidget>
+#include <QComboBox>
 
 class QStackedWidget;
-class QTabBar;
+class QComboBox;
 
 namespace Tiled {
 
@@ -91,10 +92,9 @@ private slots:
     void updateCurrentTiles();
     void tilesetChanged(Tileset *tileset);
     void tilesetRemoved(Tileset *tileset);
-    void tilesetMoved(int from, int to);
 
+    void deleteRequested(TilesetView *tv);
     void removeTileset(int index);
-    void moveTileset(int from, int to);
 
 private:
     void setCurrentTile(Tile *tile);
@@ -103,7 +103,7 @@ private:
     TilesetView *tilesetViewAt(int index) const;
 
     MapDocument *mMapDocument;
-    QTabBar *mTabBar;
+    QComboBox *mDropDown;
     QStackedWidget *mViewStack;
     Tile *mCurrentTile;
     TileLayer *mCurrentTiles;

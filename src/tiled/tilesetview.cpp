@@ -243,6 +243,16 @@ void TilesetView::contextMenuEvent(QContextMenuEvent *event)
             SLOT(editTilesetProperties()));
 
     menu.addSeparator();
+
+    QIcon deleteIcon(QLatin1String(":images/16x16/edit-delete.png"));
+    QAction *deleteTileset = menu.addAction(deleteIcon,
+                                            tr("&Delete Tileset"));
+    Utils::setThemeIcon(deleteTileset, "edit-delete");
+
+    connect(deleteTileset, SIGNAL(triggered()), SLOT(deleteTileset()));
+
+    menu.addSeparator();
+
     QAction *toggleGrid = menu.addAction(tr("Show &Grid"));
     toggleGrid->setCheckable(true);
     toggleGrid->setChecked(mDrawGrid);
@@ -307,6 +317,11 @@ void TilesetView::importTileset()
 
     QUndoCommand *command = new SetTilesetFileName(tileset, QString());
     mMapDocument->undoStack()->push(command);
+}
+
+void TilesetView::deleteTileset()
+{
+    emit deleteRequested(this);
 }
 
 void TilesetView::toggleGrid()

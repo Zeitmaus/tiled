@@ -50,7 +50,7 @@ using namespace Tiled::Internal;
 TilesetDock::TilesetDock(QWidget *parent):
     QDockWidget(parent),
     mMapDocument(0),
-    mTabBar(new QTabBar),
+    mDropDown(new QComboBox),
     mViewStack(new QStackedWidget),
     mCurrentTile(0),
     mCurrentTiles(0)
@@ -61,19 +61,13 @@ TilesetDock::TilesetDock(QWidget *parent):
     QLayout *l = new QVBoxLayout(w);
     l->setSpacing(0);
     l->setMargin(0);
-    l->addWidget(mTabBar);
+    l->addWidget(mDropDown);
     l->addWidget(mViewStack);
 
-    mTabBar->setTabsClosable(true);
-    mTabBar->setMovable(true);
-    mTabBar->setUsesScrollButtons(true);
+    mDropDown->setEditable(false);
 
-    connect(mTabBar, SIGNAL(currentChanged(int)),
+    connect(mDropDown, SIGNAL(currentIndexChanged(int)),
             mViewStack, SLOT(setCurrentIndex(int)));
-    connect(mTabBar, SIGNAL(tabCloseRequested(int)),
-            this, SLOT(removeTileset(int)));
-    connect(mTabBar, SIGNAL(tabMoved(int,int)),
-            this, SLOT(moveTileset(int,int)));
     connect(mViewStack, SIGNAL(currentChanged(int)),
             this, SLOT(updateCurrentTiles()));
 
@@ -98,8 +92,8 @@ void TilesetDock::setMapDocument(MapDocument *mapDocument)
     setCurrentTiles(0);
 
     // Clear previous content
-    while (mTabBar->count())
-        mTabBar->removeTab(0);
+    while (mDropDown->count())
+        mDropDown->removeItem(0);
     while (mViewStack->currentWidget())
         delete mViewStack->currentWidget();
 
@@ -112,14 +106,12 @@ void TilesetDock::setMapDocument(MapDocument *mapDocument)
     if (mMapDocument) {
         Map *map = mMapDocument->map();
         foreach (Tileset *tileset, map->tilesets())
-            insertTilesetView(mTabBar->count(), tileset);
+            insertTilesetView(mDropDown->count(), tileset);
 
         connect(mMapDocument, SIGNAL(tilesetAdded(int,Tileset*)),
                 SLOT(insertTilesetView(int,Tileset*)));
         connect(mMapDocument, SIGNAL(tilesetRemoved(Tileset*)),
                 SLOT(tilesetRemoved(Tileset*)));
-        connect(mMapDocument, SIGNAL(tilesetMoved(int,int)),
-                SLOT(tilesetMoved(int,int)));
     }
 }
 
@@ -164,9 +156,12 @@ void TilesetDock::insertTilesetView(int index, Tileset *tileset)
     connect(view->selectionModel(),
             SIGNAL(selectionChanged(QItemSelection,QItemSelection)),
             SLOT(updateCurrentTiles()));
+    connect(view, SIGNAL(deleteRequested(TilesetView*)),
+            SLOT(deleteRequested(TilesetView*)));
 
-    mTabBar->insertTab(index, tileset->name());
     mViewStack->insertWidget(index, view);
+    mDropDown->insertItem(index, QIcon(), tileset->name());
+    mDropDown->setCurrentIndex(index);
 }
 
 void TilesetDock::updateCurrentTiles()
@@ -228,7 +223,7 @@ void TilesetDock::tilesetRemoved(Tileset *tileset)
     for (int i = 0; i < mViewStack->count(); ++i) {
         TilesetView *view = tilesetViewAt(i);
         if (view->tilesetModel()->tileset() == tileset) {
-            mTabBar->removeTab(i);
+            mDropDown->removeItem(i);
             delete view;
             break;
         }
@@ -246,22 +241,9 @@ void TilesetDock::tilesetRemoved(Tileset *tileset)
         setCurrentTile(0);
 }
 
-void TilesetDock::tilesetMoved(int from, int to)
+void TilesetDock::deleteRequested(TilesetView *requester)
 {
-    // Move the related tileset views
-    QWidget *widget = mViewStack->widget(from);
-    mViewStack->removeWidget(widget);
-    mViewStack->insertWidget(to, widget);
-    mViewStack->setCurrentIndex(mTabBar->currentIndex());
-
-    // Update the titles of the affected tabs
-    const int start = qMin(from, to);
-    const int end = qMax(from, to);
-    for (int i = start; i <= end; ++i) {
-        const Tileset *tileset = tilesetViewAt(i)->tilesetModel()->tileset();
-        if (mTabBar->tabText(i) != tileset->name())
-            mTabBar->setTabText(i, tileset->name());
-    }
+    removeTileset(mViewStack->currentIndex());
 }
 
 /**
@@ -316,12 +298,6 @@ void TilesetDock::removeTileset(int index)
     undoStack->push(remove);
     if (inUse)
         undoStack->endMacro();
-}
-
-void TilesetDock::moveTileset(int from, int to)
-{
-    QUndoCommand *command = new MoveTileset(mMapDocument, from, to);
-    mMapDocument->undoStack()->push(command);
 }
 
 void TilesetDock::setCurrentTiles(TileLayer *tiles)

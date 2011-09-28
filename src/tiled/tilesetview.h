@@ -53,6 +53,9 @@ public:
     TilesetModel *tilesetModel() const
     { return static_cast<TilesetModel *>(model()); }
 
+signals:
+    void deleteRequested(TilesetView *requester);
+
 protected:
     void wheelEvent(QWheelEvent *event);
     void contextMenuEvent(QContextMenuEvent *event);
@@ -62,6 +65,7 @@ private slots:
     void editTilesetProperties();
     void exportTileset();
     void importTileset();
+    void deleteTileset();
     void toggleGrid();
 
     void adjustScale();
