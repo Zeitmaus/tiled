@@ -171,6 +171,7 @@ void CreateTileObjectTool::finishNewMapObject()
 {
     Q_ASSERT(mNewMapObjectItem);
     MapObject *newMapObject = mNewMapObjectItem->mapObject();
+    QPointF lastPos = newMapObject->position();
     ObjectGroup *objectGroup = newMapObject->objectGroup();
     clearNewMapObjectItem();
 
@@ -179,6 +180,7 @@ void CreateTileObjectTool::finishNewMapObject()
                                                       newMapObject));
 
     startNewMapObject();
+    mNewMapObjectItem->mapObject()->setPosition(lastPos);
 }
 
 void CreateTileObjectTool::setTile(Tile * tile)
