@@ -263,7 +263,8 @@ void MapObjectItem::paint(QPainter *painter,
                           QWidget *)
 {
     painter->translate(-pos());
-    mMapDocument->renderer()->drawMapObject(painter, mObject, mColor);
+    mMapDocument->renderer()->drawMapObjectDecorate(painter, mObject, mColor,
+                                                    Preferences::instance()->showGrid());
 
     if (mIsEditable) {
         painter->translate(pos());
