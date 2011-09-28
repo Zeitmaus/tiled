@@ -261,6 +261,14 @@ void IsometricRenderer::drawMapObject(QPainter *painter,
                                       const MapObject *object,
                                       const QColor &color) const
 {
+    drawMapObjectDecorate(&*painter, &*object, color, true);
+}
+
+void IsometricRenderer::drawMapObjectDecorate(QPainter *painter,
+                                              const MapObject *object,
+                                              const QColor &color,
+                                              bool decorate) const
+{
     painter->save();
 
     QPen pen(Qt::black);
@@ -271,13 +279,15 @@ void IsometricRenderer::drawMapObject(QPainter *painter,
         paintOrigin += tileToPixelCoords(object->position()).toPoint();
         painter->drawPixmap(paintOrigin, img);
 
-        pen.setStyle(Qt::SolidLine);
-        painter->setPen(pen);
-        painter->drawRect(QRectF(paintOrigin, img.size()));
-        pen.setStyle(Qt::DotLine);
-        pen.setColor(color);
-        painter->setPen(pen);
-        painter->drawRect(QRectF(paintOrigin, img.size()));
+        if (decorate) {
+            pen.setStyle(Qt::SolidLine);
+            painter->setPen(pen);
+            painter->drawRect(QRectF(paintOrigin, img.size()));
+            pen.setStyle(Qt::DotLine);
+            pen.setColor(color);
+            painter->setPen(pen);
+            painter->drawRect(QRectF(paintOrigin, img.size()));
+        }
     } else {
         QColor brushColor = color;
         brushColor.setAlpha(50);

@@ -156,7 +156,8 @@ void SaveAsImageDialog::accept()
         } else if (objGroup) {
             foreach (const MapObject *object, objGroup->objects()) {
                 const QColor color = MapObjectItem::objectColor(object);
-                renderer->drawMapObject(&painter, object, color);
+                renderer->drawMapObjectDecorate(&painter, object,
+                                                color, drawTileGrid);
             }
         }
     }

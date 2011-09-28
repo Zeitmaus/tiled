@@ -241,6 +241,14 @@ void OrthogonalRenderer::drawMapObject(QPainter *painter,
                                        const MapObject *object,
                                        const QColor &color) const
 {
+    drawMapObjectDecorate(&*painter, &*object, color, true);
+}
+
+void OrthogonalRenderer::drawMapObjectDecorate(QPainter *painter,
+                                               const MapObject *object,
+                                               const QColor &color,
+                                               bool decorate) const
+{
     painter->save();
 
     const QRectF bounds = object->bounds();
@@ -255,13 +263,15 @@ void OrthogonalRenderer::drawMapObject(QPainter *painter,
         const QPoint paintOrigin(0, -img.height());
         painter->drawPixmap(paintOrigin, img);
 
-        QPen pen(Qt::SolidLine);
-        painter->setPen(pen);
-        painter->drawRect(QRect(paintOrigin, img.size()));
-        pen.setStyle(Qt::DotLine);
-        pen.setColor(color);
-        painter->setPen(pen);
-        painter->drawRect(QRect(paintOrigin, img.size()));
+        if (decorate) {
+            QPen pen(Qt::SolidLine);
+            painter->setPen(pen);
+            painter->drawRect(QRect(paintOrigin, img.size()));
+            pen.setStyle(Qt::DotLine);
+            pen.setColor(color);
+            painter->setPen(pen);
+            painter->drawRect(QRect(paintOrigin, img.size()));
+        }
     } else {
         const QPen linePen(color, 2);
         const QPen shadowPen(Qt::black, 2);

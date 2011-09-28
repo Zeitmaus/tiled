@@ -112,6 +112,15 @@ public:
                                const QColor &color) const = 0;
 
     /**
+     * Draws the \a object in the given \a color using the \a painter.
+     * If decorate is false the highlight rectangle will not be drawn.
+     */
+    virtual void drawMapObjectDecorate(QPainter *painter,
+                                       const MapObject *object,
+                                       const QColor &color,
+                                       bool decorate) const = 0;
+
+    /**
      * Returns the tile coordinates matching the given pixel position.
      */
     virtual QPointF pixelToTileCoords(qreal x, qreal y) const = 0;
