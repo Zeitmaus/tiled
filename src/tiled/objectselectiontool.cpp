@@ -295,7 +295,7 @@ void ObjectSelectionTool::flipVertically()
     }
 }
 
-void ObjectSelectionTool::rotateCCW()
+void ObjectSelectionTool::rotateCW()
 {
     if (!mapScene()) return;
     foreach (MapObjectItem *objectItem, mapScene()->selectedObjectItems()) {

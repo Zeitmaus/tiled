@@ -1208,7 +1208,7 @@ void MainWindow::flipStampVertically()
 
 void MainWindow::rotateStamp()
 {
-    mObjectSelectionTool->rotateCCW();
+    mObjectSelectionTool->rotateCW();
 }
 
 /**

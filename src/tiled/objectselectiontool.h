@@ -50,7 +50,7 @@ public:
 
     void flipHorizontally();
     void flipVertically();
-    void rotateCCW();
+    void rotateCW();
 
 private:
     enum Mode {

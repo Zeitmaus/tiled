@@ -611,6 +611,7 @@ MapObject *MapReaderPrivate::readObject()
         object->setTile(cell.tile);
         object->setFlipHorizontally(cell.flippedHorizontally);
         object->setFlipVertically(cell.flippedVertically);
+        object->setRotation(cell.ang);
     }
 
     while (xml.readNextStartElement()) {

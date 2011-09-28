@@ -93,10 +93,10 @@ public:
         if (tile) {
             qreal fx = flippedHorizontally ? -1 : 1;
             qreal fy = flippedVertically ? -1 : 1;
-            quint32 deg = 90 * (ang % 4);
-            QTransform mat(fx, qreal(0), qreal(0), qreal(0), fy, qreal(0),  qreal(0),  qreal(0),  qreal(1));
+            QTransform mat;
+            mat = mat.rotate(90 * (ang % 4));
             qi = tile->image().toImage();
-            qi = qi.transformed(mat.rotate(deg), Qt::FastTransformation);
+            qi = qi.transformed(mat.scale(fx, fy), Qt::FastTransformation);
         }
         return qi;
     }

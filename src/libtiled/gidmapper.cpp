@@ -30,6 +30,10 @@ using namespace Tiled;
 const int FlippedHorizontallyFlag = 0x80000000;
 const int FlippedVerticallyFlag   = 0x40000000;
 
+// 2 bits are used so that flipped context is not lost over multiple rotations.
+const int RotationMask            = 0x30000000;
+const int angShift                = 28;
+
 GidMapper::GidMapper()
 {
 }
@@ -49,10 +53,13 @@ Cell GidMapper::gidToCell(uint gid, bool &ok) const
 
     // Read out the flags
     result.flippedHorizontally = (gid & FlippedHorizontallyFlag);
-    result.flippedVertically = (gid & FlippedVerticallyFlag);
+    result.flippedVertically   = (gid & FlippedVerticallyFlag);
+    result.ang                 = (gid & RotationMask) >> angShift;
 
     // Clear the flags
-    gid &= ~(FlippedHorizontallyFlag | FlippedVerticallyFlag);
+    gid &= ~(FlippedHorizontallyFlag |
+             FlippedVerticallyFlag   |
+             RotationMask);
 
     if (gid == 0) {
         ok = true;
@@ -106,6 +113,7 @@ uint GidMapper::cellToGid(const Cell &cell) const
         gid |= FlippedHorizontallyFlag;
     if (cell.flippedVertically)
         gid |= FlippedVerticallyFlag;
+    gid |= (cell.ang << angShift) & RotationMask;
 
     return gid;
 }
