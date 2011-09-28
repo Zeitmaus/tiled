@@ -272,3 +272,25 @@ void ObjectSelectionTool::finishMoving(const QPointF &pos)
     mOldObjectPositions.clear();
     mMovingItems.clear();
 }
+
+void ObjectSelectionTool::flipHorizontally()
+{
+    if (!mapScene()) return;
+    foreach (MapObjectItem *objectItem, mapScene()->selectedObjectItems()) {
+        if (objectItem->mapObject()->tile()) {
+            objectItem->mapObject()->toggleFlipHorizontal();
+            objectItem->update();
+        }
+    }
+}
+
+void ObjectSelectionTool::flipVertically()
+{
+    if (!mapScene()) return;
+    foreach (MapObjectItem *objectItem, mapScene()->selectedObjectItems()) {
+        if (objectItem->mapObject()->tile()) {
+            objectItem->mapObject()->toggleFlipVertical();
+            objectItem->update();
+        }
+    }
+}

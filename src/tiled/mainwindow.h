@@ -51,6 +51,7 @@ class MapScene;
 class StampBrush;
 class BucketFillTool;
 class CreateTileObjectTool;
+class ObjectSelectionTool;
 class TilesetDock;
 class MapView;
 class CommandButton;
@@ -205,6 +206,7 @@ private:
     StampBrush *mStampBrush;
     BucketFillTool *mBucketFillTool;
     CreateTileObjectTool *mCreateTileObjectTool;
+    ObjectSelectionTool *mObjectSelectionTool;
 
     ClipboardManager *mClipboardManager;
 

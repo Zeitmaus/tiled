@@ -48,6 +48,9 @@ public:
 
     void languageChanged();
 
+    void flipHorizontally();
+    void flipVertically();
+
 private:
     enum Mode {
         NoMode,

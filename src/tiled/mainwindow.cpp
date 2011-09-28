@@ -304,6 +304,7 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags)
     mStampBrush = new StampBrush(this);
     mBucketFillTool = new BucketFillTool(this);
     mCreateTileObjectTool = new CreateTileObjectTool(this);
+    mObjectSelectionTool = new ObjectSelectionTool(this);
     CreateObjectTool *areaObjectsTool = new CreateObjectTool(
             CreateObjectTool::CreateArea, this);
     CreateObjectTool *polygonObjectsTool = new CreateObjectTool(
@@ -327,7 +328,7 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags)
     toolManager->registerTool(new Eraser(this));
     toolManager->registerTool(new TileSelectionTool(this));
     toolManager->addSeparator();
-    toolManager->registerTool(new ObjectSelectionTool(this));
+    toolManager->registerTool(mObjectSelectionTool);
     toolManager->registerTool(new EditPolygonTool(this));
     toolManager->registerTool(areaObjectsTool);
     toolManager->registerTool(mCreateTileObjectTool);
@@ -1190,6 +1191,7 @@ void MainWindow::flipStampHorizontally()
         setStampBrush(stamp);
     }
     mCreateTileObjectTool->flipHorizontally();
+    mObjectSelectionTool->flipHorizontally();
 }
 
 void MainWindow::flipStampVertically()
@@ -1200,6 +1202,7 @@ void MainWindow::flipStampVertically()
         setStampBrush(stamp);
     }
     mCreateTileObjectTool->flipVertically();
+    mObjectSelectionTool->flipVertically();
 }
 
 /**
