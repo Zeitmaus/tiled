@@ -609,6 +609,8 @@ MapObject *MapReaderPrivate::readObject()
     if (gid) {
         const Cell cell = cellForGid(gid);
         object->setTile(cell.tile);
+        object->setFlipHorizontally(cell.flippedHorizontally);
+        object->setFlipVertically(cell.flippedVertically);
     }
 
     while (xml.readNextStartElement()) {
