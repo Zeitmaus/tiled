@@ -19,6 +19,7 @@ public:
     CreateTileObjectTool(QObject *parent = 0);
     ~CreateTileObjectTool();
 
+    void activate(MapScene *scene);
     void deactivate(MapScene *scene);
 
     void mouseEntered();
@@ -29,15 +30,18 @@ public:
 
     void languageChanged();
 
+    void flipHorizontally();
+    void flipVertically();
+
 public slots:
     /**
      * Sets the tile that will be used when the creation mode is
      * CreateTileObjects.
      */
-    void setTile(Tile *tile) { mTile = tile; }
+    void setTile(Tile *tile);
 
 private:
-    void startNewMapObject(const QPointF &pos, ObjectGroup *objectGroup);
+    void startNewMapObject();
     MapObject *clearNewMapObjectItem();
     void cancelNewMapObject();
     void finishNewMapObject();

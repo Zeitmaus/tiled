@@ -1189,6 +1189,7 @@ void MainWindow::flipStampHorizontally()
         stamp->flip(TileLayer::FlipHorizontally);
         setStampBrush(stamp);
     }
+    mCreateTileObjectTool->flipHorizontally();
 }
 
 void MainWindow::flipStampVertically()
@@ -1198,6 +1199,7 @@ void MainWindow::flipStampVertically()
         stamp->flip(TileLayer::FlipVertically);
         setStampBrush(stamp);
     }
+    mCreateTileObjectTool->flipVertically();
 }
 
 /**

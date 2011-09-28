@@ -58,6 +58,12 @@ CreateTileObjectTool::~CreateTileObjectTool()
     delete mOverlayObjectGroup;
 }
 
+void CreateTileObjectTool::activate(MapScene *scene)
+{
+    AbstractObjectTool::activate(scene);
+    startNewMapObject();
+}
+
 void CreateTileObjectTool::deactivate(MapScene *scene)
 {
     if (mNewMapObjectItem) cancelNewMapObject();
@@ -82,7 +88,10 @@ void CreateTileObjectTool::mouseMoved(const QPointF &pos,
     if (modifiers & Qt::ControlModifier)
         snapToGrid = !snapToGrid;
 
-    const QSize imgSize = mNewMapObjectItem->mapObject()->tile()->size();
+    if (!mTile) return;
+
+    const QImage img = mNewMapObjectItem->mapObject()->getCell().toImage();
+    const QSize imgSize = img.size();
     const QPointF diff(-imgSize.width() / 2, imgSize.height() / 2);
     QPointF tileCoords = renderer->pixelToTileCoords(pos + diff);
 
@@ -106,25 +115,6 @@ void CreateTileObjectTool::mousePressed(QGraphicsSceneMouseEvent *event)
         AbstractObjectTool::mousePressed(event);
         return;
     }
-
-    ObjectGroup *objectGroup = currentObjectGroup();
-    if (!objectGroup || !objectGroup->isVisible())
-        return;
-
-    if (!mTile) return;
-
-    const MapRenderer *renderer = mapDocument()->renderer();
-    const QPointF diff(-mTile->width() / 2, mTile->height() / 2);
-    QPointF tileCoords = renderer->pixelToTileCoords(event->scenePos() + diff);
-
-    bool snapToGrid = Preferences::instance()->snapToGrid();
-    if (event->modifiers() & Qt::ControlModifier)
-        snapToGrid = !snapToGrid;
-
-    if (snapToGrid)
-        tileCoords = tileCoords.toPoint();
-
-    startNewMapObject(tileCoords, objectGroup);
 }
 
 void CreateTileObjectTool::mouseReleased(QGraphicsSceneMouseEvent *event)
@@ -139,15 +129,16 @@ void CreateTileObjectTool::languageChanged()
     setShortcut(QKeySequence(tr("T")));
 }
 
-void CreateTileObjectTool::startNewMapObject(const QPointF &pos,
-                                         ObjectGroup *objectGroup)
+void CreateTileObjectTool::startNewMapObject()
 {
     Q_ASSERT(!mNewMapObjectItem);
 
-    if (!mTile) return;
+    ObjectGroup *objectGroup = currentObjectGroup();
+    if (!objectGroup || !objectGroup->isVisible())
+        return;
 
     MapObject *newMapObject = new MapObject;
-    newMapObject->setPosition(pos);
+    newMapObject->setPosition(QPointF(0, 0));
     newMapObject->setTile(mTile);
     objectGroup->addObject(newMapObject);
 
@@ -186,4 +177,29 @@ void CreateTileObjectTool::finishNewMapObject()
     mapDocument()->undoStack()->push(new AddMapObject(mapDocument(),
                                                       objectGroup,
                                                       newMapObject));
+
+    startNewMapObject();
+}
+
+void CreateTileObjectTool::setTile(Tile * tile)
+{
+    mTile = tile;
+    if (mNewMapObjectItem)
+        mNewMapObjectItem->mapObject()->setTile(mTile);
+}
+
+void CreateTileObjectTool::flipHorizontally()
+{
+    if (mapScene() && mNewMapObjectItem) {
+        mNewMapObjectItem->mapObject()->toggleFlipHorizontal();
+        mNewMapObjectItem->update();
+    }
+}
+
+void CreateTileObjectTool::flipVertically()
+{
+    if (mapScene() && mNewMapObjectItem) {
+        mNewMapObjectItem->mapObject()->toggleFlipVertical();
+        mNewMapObjectItem->update();
+    }
 }
