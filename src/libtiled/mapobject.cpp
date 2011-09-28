@@ -34,7 +34,6 @@ using namespace Tiled;
 MapObject::MapObject():
     mSize(0, 0),
     mShape(Rectangle),
-    mTile(0),
     mObjectGroup(0)
 {
 }
@@ -47,7 +46,6 @@ MapObject::MapObject(const QString &name, const QString &type,
     mPos(pos),
     mSize(size),
     mShape(Rectangle),
-    mTile(0),
     mObjectGroup(0)
 {
 }
@@ -58,6 +56,8 @@ MapObject *MapObject::clone() const
     o->setProperties(properties());
     o->setPolygon(mPolygon);
     o->setShape(mShape);
-    o->setTile(mTile);
+    o->setTile(mCell.tile);
+    o->setFlipHorizontally(mCell.flippedHorizontally);
+    o->setFlipVertically(mCell.flippedVertically);
     return o;
 }

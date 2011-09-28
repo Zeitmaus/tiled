@@ -266,10 +266,11 @@ void IsometricRenderer::drawMapObjectDecorate(QPainter *painter,
     QPen pen(Qt::black);
 
     if (object->tile()) {
-        const QPixmap &img = object->tile()->image();
+        const QImage img = object->getCell().toImage();
         QPointF paintOrigin(-img.width() / 2, -img.height());
         paintOrigin += tileToPixelCoords(object->position()).toPoint();
-        painter->drawPixmap(paintOrigin, img);
+        painter->drawImage(paintOrigin, img);
+
 
         if (decorate) {
             pen.setStyle(Qt::SolidLine);

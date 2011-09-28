@@ -32,6 +32,7 @@
 #define MAPOBJECT_H
 
 #include "object.h"
+#include "tilelayer.h"
 
 #include <QPolygonF>
 #include <QSizeF>
@@ -203,12 +204,12 @@ public:
      *
      * \warning The object shape is ignored for tile objects!
      */
-    void setTile(Tile *tile) { mTile = tile; }
+    void setTile(Tile *tile) { mCell.tile = tile; }
 
     /**
      * Returns the tile associated with this object.
      */
-    Tile *tile() const { return mTile; }
+    Tile *tile() const { return mCell.tile; }
 
     /**
      * Returns the object group this object belongs to.
@@ -228,6 +229,31 @@ public:
      */
     MapObject *clone() const;
 
+    /**
+     *  Getters and Setters for handling flipping routines.
+     */
+    inline void setFlipHorizontally(bool flip)
+    {
+        mCell.flippedHorizontally = flip;
+    }
+
+    inline void setFlipVertically(bool flip)
+    {
+        mCell.flippedVertically = flip;
+    }
+
+    inline void toggleFlipHorizontal()
+    {
+        mCell.toggleFlipHorizontal();
+    }
+
+    inline void toggleFlipVertical()
+    {
+        mCell.toggleFlipVertical();
+    }
+
+    Cell getCell() const { return mCell; }
+
 private:
     QString mName;
     QString mType;
@@ -235,7 +261,7 @@ private:
     QSizeF mSize;
     QPolygonF mPolygon;
     Shape mShape;
-    Tile *mTile;
+    Cell mCell;
     ObjectGroup *mObjectGroup;
 };
 

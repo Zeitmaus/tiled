@@ -252,9 +252,9 @@ void OrthogonalRenderer::drawMapObjectDecorate(QPainter *painter,
     rect.moveTopLeft(QPointF(0, 0));
 
     if (object->tile()) {
-        const QPixmap &img = object->tile()->image();
+        const QImage img = object->getCell().toImage();
         const QPoint paintOrigin(0, -img.height());
-        painter->drawPixmap(paintOrigin, img);
+        painter->drawImage(paintOrigin, img);
 
         if (decorate) {
             QPen pen(Qt::SolidLine);
