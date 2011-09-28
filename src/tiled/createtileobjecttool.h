@@ -32,6 +32,7 @@ public:
 
     void flipHorizontally();
     void flipVertically();
+    void rotateCW();
 
 public slots:
     /**

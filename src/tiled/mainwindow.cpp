@@ -1208,6 +1208,7 @@ void MainWindow::flipStampVertically()
 
 void MainWindow::rotateStamp()
 {
+    mCreateTileObjectTool->rotateCW();
     mObjectSelectionTool->rotateCW();
 }
 

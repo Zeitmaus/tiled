@@ -203,3 +203,12 @@ void CreateTileObjectTool::flipVertically()
         mNewMapObjectItem->update();
     }
 }
+
+void CreateTileObjectTool::rotateCW()
+{
+    if (!mapScene()) return;
+    if (!mNewMapObjectItem->mapObject()->tile()) return;
+    mNewMapObjectItem->mapObject()->incrementRotation();
+    mNewMapObjectItem->syncWithMapObject();
+    mNewMapObjectItem->update();
+}
