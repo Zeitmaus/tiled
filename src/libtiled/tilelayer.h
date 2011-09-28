@@ -52,13 +52,15 @@ public:
     Cell() :
         tile(0),
         flippedHorizontally(false),
-        flippedVertically(false)
+        flippedVertically(false),
+        ang(0)
     {}
 
     explicit Cell(Tile *tile) :
         tile(tile),
         flippedHorizontally(false),
-        flippedVertically(false)
+        flippedVertically(false),
+        ang(0)
     {}
 
     bool isEmpty() const { return tile == 0; }
@@ -81,13 +83,20 @@ public:
 
     void toggleFlipVertical() { flippedVertically = !flippedVertically; }
 
+    void setRotation(qint32 ccw) { ang = ccw % 4; }
+
+    void incrementRotation() { ang = (ang + 1) % 4; }
+
     QImage toImage() const
     {
         QImage qi;
         if (tile) {
+            qreal fx = flippedHorizontally ? -1 : 1;
+            qreal fy = flippedVertically ? -1 : 1;
+            quint32 deg = 90 * (ang % 4);
+            QTransform mat(fx, qreal(0), qreal(0), qreal(0), fy, qreal(0),  qreal(0),  qreal(0),  qreal(1));
             qi = tile->image().toImage();
-            qi = qi.mirrored(flippedHorizontally,
-                             flippedVertically);
+            qi = qi.transformed(mat.rotate(deg), Qt::FastTransformation);
         }
         return qi;
     }
@@ -95,6 +104,7 @@ public:
     Tile *tile;
     bool flippedHorizontally;
     bool flippedVertically;
+    quint32 ang;
 };
 
 /**

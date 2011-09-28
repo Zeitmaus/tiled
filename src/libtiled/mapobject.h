@@ -252,7 +252,23 @@ public:
         mCell.toggleFlipVertical();
     }
 
+    inline void setRotation(qint32 steps)
+    {
+        mCell.setRotation(steps);
+    }
+
+    inline void incrementRotation()
+    {
+        mCell.incrementRotation();
+    }
+
+    inline QImage toImage() const
+    {
+        return mCell.toImage();
+    }
+
     Cell getCell() const { return mCell; }
+
 
 private:
     QString mName;

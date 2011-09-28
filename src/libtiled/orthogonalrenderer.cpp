@@ -64,7 +64,7 @@ QRectF OrthogonalRenderer::boundingRect(const MapObject *object) const
 
     if (object->tile()) {
         const QPointF bottomLeft = rect.topLeft();
-        const QPixmap &img = object->tile()->image();
+        const QImage img = object->toImage();
         boundingRect = QRectF(bottomLeft.x(),
                               bottomLeft.y() - img.height(),
                               img.width(),
@@ -252,7 +252,7 @@ void OrthogonalRenderer::drawMapObjectDecorate(QPainter *painter,
     rect.moveTopLeft(QPointF(0, 0));
 
     if (object->tile()) {
-        const QImage img = object->getCell().toImage();
+        const QImage img = object->toImage();
         const QPoint paintOrigin(0, -img.height());
         painter->drawImage(paintOrigin, img);
 

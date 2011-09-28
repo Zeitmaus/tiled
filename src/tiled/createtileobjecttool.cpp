@@ -90,7 +90,7 @@ void CreateTileObjectTool::mouseMoved(const QPointF &pos,
 
     if (!mTile) return;
 
-    const QImage img = mNewMapObjectItem->mapObject()->getCell().toImage();
+    const QImage img = mNewMapObjectItem->mapObject()->toImage();
     const QSize imgSize = img.size();
     const QPointF diff(-imgSize.width() / 2, imgSize.height() / 2);
     QPointF tileCoords = renderer->pixelToTileCoords(pos + diff);

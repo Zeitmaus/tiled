@@ -294,3 +294,15 @@ void ObjectSelectionTool::flipVertically()
         }
     }
 }
+
+void ObjectSelectionTool::rotateCCW()
+{
+    if (!mapScene()) return;
+    foreach (MapObjectItem *objectItem, mapScene()->selectedObjectItems()) {
+        if (objectItem->mapObject()->tile()) {
+            objectItem->mapObject()->incrementRotation();
+            objectItem->syncWithMapObject();
+            objectItem->update();
+        }
+    }
+}

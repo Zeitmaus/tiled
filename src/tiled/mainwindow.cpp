@@ -363,6 +363,7 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags)
 
     new QShortcut(tr("X"), this, SLOT(flipStampHorizontally()));
     new QShortcut(tr("Y"), this, SLOT(flipStampVertically()));
+    new QShortcut(tr("D"), this, SLOT(rotateStamp()));
 
     updateActions();
     readSettings();
@@ -1203,6 +1204,11 @@ void MainWindow::flipStampVertically()
     }
     mCreateTileObjectTool->flipVertically();
     mObjectSelectionTool->flipVertically();
+}
+
+void MainWindow::rotateStamp()
+{
+    mObjectSelectionTool->rotateCCW();
 }
 
 /**
