@@ -67,6 +67,9 @@ protected:
     void mapDocumentChanged(MapDocument *oldDocument,
                             MapDocument *newDocument);
 
+public slots:
+    void setRandom(bool value);
+
 private slots:
     void clearOverlay();
 
@@ -80,6 +83,7 @@ private:
 
     bool mLastShiftStatus;
     bool mActive;
+    bool mRandom;
 };
 
 } // namespace Internal

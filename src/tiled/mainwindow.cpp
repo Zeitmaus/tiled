@@ -320,6 +320,8 @@ MainWindow::MainWindow(QWidget *parent, Qt::WFlags flags)
 
     connect(randomButton, SIGNAL(toggled(bool)),
             mStampBrush, SLOT(setRandom(bool)));
+    connect(randomButton, SIGNAL(toggled(bool)),
+            mBucketFillTool, SLOT(setRandom(bool)));
 
     ToolManager *toolManager = ToolManager::instance();
     toolManager->registerTool(mStampBrush);

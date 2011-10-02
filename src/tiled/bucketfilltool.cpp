@@ -44,6 +44,7 @@ BucketFillTool::BucketFillTool(QObject *parent)
     , mStamp(0)
     , mFillOverlay(0)
     , mActive(false)
+    , mRandom(false)
 {
 }
 
@@ -137,7 +138,7 @@ void BucketFillTool::tilePositionChanged(const QPoint &tilePos)
 
     // Paint the new overlay
     TilePainter tilePainter(mapDocument(), mFillOverlay);
-    tilePainter.drawStampBiased(mStamp, mFillRegion, x_bias, y_bias);
+    tilePainter.drawStampBiased(mStamp, mFillRegion, x_bias, y_bias, mRandom);
 
     // Crop the overlay to the smallest possible size
     const QRect fillBounds = mFillRegion.boundingRect();
@@ -263,4 +264,9 @@ void BucketFillTool::clearConnections(MapDocument *mapDocument)
 
     disconnect(mapDocument, SIGNAL(tileSelectionChanged(QRegion,QRegion)),
                this, SLOT(clearOverlay()));
+}
+
+void BucketFillTool::setRandom(bool value)
+{
+    mRandom = value;
 }
