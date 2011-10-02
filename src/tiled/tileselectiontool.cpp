@@ -39,7 +39,7 @@ TileSelectionTool::TileSelectionTool(QObject *parent)
     , mSelectionMode(Replace)
     , mSelecting(false)
 {
-    setTilePositionMethod(BetweenTiles);
+    setTilePositionMethod(OnTiles);
 }
 
 void TileSelectionTool::tilePositionChanged(const QPoint &)
@@ -121,8 +121,8 @@ QRect TileSelectionTool::selectedArea() const
     const QPoint tilePos = tilePosition();
     const QPoint pos(qMin(tilePos.x(), mSelectionStart.x()),
                      qMin(tilePos.y(), mSelectionStart.y()));
-    const QSize size(qAbs(tilePos.x() - mSelectionStart.x()),
-                     qAbs(tilePos.y() - mSelectionStart.y()));
+    const QSize size(qAbs(tilePos.x() - mSelectionStart.x()) + 1,
+                     qAbs(tilePos.y() - mSelectionStart.y()) + 1);
 
     return QRect(pos, size);
 }
