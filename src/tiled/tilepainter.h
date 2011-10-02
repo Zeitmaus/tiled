@@ -90,6 +90,13 @@ public:
     void drawStamp(const TileLayer *stamp, const QRegion &drawRegion);
 
     /**
+     * Draws the stamp within the given \a drawRegion region, repeating the
+     * stamp as needed.  The stamp is offset by \a x_bias and \a y_bias.
+     */
+    void drawStampBiased(const TileLayer *stamp, const QRegion &drawRegion,
+                             int x_bias, int y_bias, bool random);
+
+    /**
      * Erases the cells in the given region.
      */
     void erase(const QRegion &region);

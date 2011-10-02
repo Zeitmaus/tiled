@@ -43,6 +43,8 @@ BucketFillTool::BucketFillTool(QObject *parent)
                        parent)
     , mStamp(0)
     , mFillOverlay(0)
+    , mActive(false)
+    , mRandom(false)
 {
 }
 
@@ -55,18 +57,28 @@ BucketFillTool::~BucketFillTool()
 void BucketFillTool::activate(MapScene *scene)
 {
     AbstractTileTool::activate(scene);
+    mActive = true;
     brushItem()->setTileLayer(mFillOverlay);
+}
+
+void BucketFillTool::deactivate(MapScene *scene)
+{
+    mActive = false;
+    AbstractTileTool::deactivate(scene);
 }
 
 void BucketFillTool::tilePositionChanged(const QPoint &tilePos)
 {
     bool shiftPressed = QApplication::keyboardModifiers() & Qt::ShiftModifier;
+    bool controlPressed = QApplication::keyboardModifiers() & Qt::ControlModifier;
 
     // Optimization: we don't need to recalculate the fill area
     // if the new mouse position is still over the filled region
     // and the shift modifier hasn't changed.
-    if (mFillRegion.contains(tilePos) && shiftPressed == mLastShiftStatus)
-        return;
+    if (!controlPressed &&
+        mFillRegion.contains(tilePos) &&
+        shiftPressed == mLastShiftStatus)
+            return;
 
     // Cache information about how the fill region was created
     mLastShiftStatus = shiftPressed;
@@ -120,9 +132,13 @@ void BucketFillTool::tilePositionChanged(const QPoint &tilePos)
                                  tileLayer->width(),
                                  tileLayer->height());
 
+    // Calculate stamp bias
+    int x_bias = mStamp->width() - tilePos.x() % mStamp->width();
+    int y_bias = mStamp->height() - tilePos.y() % mStamp->height();
+
     // Paint the new overlay
     TilePainter tilePainter(mapDocument(), mFillOverlay);
-    tilePainter.drawStamp(mStamp, mFillRegion);
+    tilePainter.drawStampBiased(mStamp, mFillRegion, x_bias, y_bias, mRandom);
 
     // Crop the overlay to the smallest possible size
     const QRect fillBounds = mFillRegion.boundingRect();
@@ -152,6 +168,12 @@ void BucketFillTool::mousePressed(QGraphicsSceneMouseEvent *event)
     QRegion fillRegion(mFillRegion);
     mapDocument()->undoStack()->push(fillTiles);
     mapDocument()->emitRegionEdited(fillRegion, currentTileLayer());
+}
+
+void BucketFillTool::mouseMoved(const QPointF &pos, Qt::KeyboardModifiers modifiers)
+{
+    AbstractTileTool::mouseMoved(pos, modifiers);
+    tilePositionChanged(tilePosition());
 }
 
 void BucketFillTool::mouseReleased(QGraphicsSceneMouseEvent *)
@@ -191,7 +213,9 @@ void BucketFillTool::setStamp(TileLayer *stamp)
     clearOverlay();
 
     delete mStamp;
-    mStamp = stamp;
+    mStamp = stamp;    
+
+    if (mActive) tilePositionChanged(tilePosition());
 }
 
 void BucketFillTool::clearOverlay()
@@ -240,4 +264,9 @@ void BucketFillTool::clearConnections(MapDocument *mapDocument)
 
     disconnect(mapDocument, SIGNAL(tileSelectionChanged(QRegion,QRegion)),
                this, SLOT(clearOverlay()));
+}
+
+void BucketFillTool::setRandom(bool value)
+{
+    mRandom = value;
 }

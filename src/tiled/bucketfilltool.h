@@ -45,9 +45,11 @@ public:
     ~BucketFillTool();
 
     void activate(MapScene *scene);
+    void deactivate(MapScene *scene);
 
     void mousePressed(QGraphicsSceneMouseEvent *event);
     void mouseReleased(QGraphicsSceneMouseEvent *event);
+    void mouseMoved(const QPointF &pos, Qt::KeyboardModifiers modifiers);
 
     void modifiersChanged(Qt::KeyboardModifiers);
 
@@ -65,6 +67,9 @@ protected:
     void mapDocumentChanged(MapDocument *oldDocument,
                             MapDocument *newDocument);
 
+public slots:
+    void setRandom(bool value);
+
 private slots:
     void clearOverlay();
 
@@ -77,6 +82,8 @@ private:
     QRegion mFillRegion;
 
     bool mLastShiftStatus;
+    bool mActive;
+    bool mRandom;
 };
 
 } // namespace Internal

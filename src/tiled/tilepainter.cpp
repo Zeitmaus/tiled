@@ -109,6 +109,15 @@ void TilePainter::drawCells(int x, int y, TileLayer *tileLayer)
 void TilePainter::drawStamp(const TileLayer *stamp,
                             const QRegion &drawRegion)
 {
+    drawStampBiased(stamp, drawRegion, 0, 0, false);
+}
+
+void TilePainter::drawStampBiased(const TileLayer *stamp,
+                                  const QRegion &drawRegion,
+                                  int x_bias,
+                                  int y_bias,
+                                  bool random)
+{
     Q_ASSERT(stamp);
     if (stamp->bounds().isEmpty())
         return;
@@ -124,8 +133,15 @@ void TilePainter::drawStamp(const TileLayer *stamp,
     foreach (const QRect &rect, region.rects()) {
         for (int _x = rect.left(); _x <= rect.right(); ++_x) {
             for (int _y = rect.top(); _y <= rect.bottom(); ++_y) {
-                const int stampX = (_x - regionBounds.left()) % w;
-                const int stampY = (_y - regionBounds.top()) % h;
+                int stampX;
+                int stampY;
+                if (!random) {
+                    stampX = (_x + x_bias - regionBounds.left()) % w;
+                    stampY = (_y + y_bias - regionBounds.top()) % h;
+                } else {
+                    stampX = rand() % w;
+                    stampY = rand() % h;
+                }
                 const Cell &cell = stamp->cellAt(stampX, stampY);
                 if (cell.isEmpty())
                     continue;
