@@ -67,9 +67,9 @@ protected:
     ObjectGroup *currentObjectGroup() const;
     MapObjectItem *topMostObjectItemAt(QPointF pos) const;
 
-private:
     void showContextMenu(MapObjectItem *clickedObject,
                          QPoint screenPos, QWidget *parent);
+private:
 
     void duplicateObjects(const QList<MapObject*> &objects);
     void removeObjects(const QList<MapObject*> &objects);
