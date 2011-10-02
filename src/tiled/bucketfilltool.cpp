@@ -43,6 +43,7 @@ BucketFillTool::BucketFillTool(QObject *parent)
                        parent)
     , mStamp(0)
     , mFillOverlay(0)
+    , mActive(false)
 {
 }
 
@@ -55,7 +56,14 @@ BucketFillTool::~BucketFillTool()
 void BucketFillTool::activate(MapScene *scene)
 {
     AbstractTileTool::activate(scene);
+    mActive = true;
     brushItem()->setTileLayer(mFillOverlay);
+}
+
+void BucketFillTool::deactivate(MapScene *scene)
+{
+    mActive = false;
+    AbstractTileTool::deactivate(scene);
 }
 
 void BucketFillTool::tilePositionChanged(const QPoint &tilePos)
@@ -204,7 +212,9 @@ void BucketFillTool::setStamp(TileLayer *stamp)
     clearOverlay();
 
     delete mStamp;
-    mStamp = stamp;
+    mStamp = stamp;    
+
+    if (mActive) tilePositionChanged(tilePosition());
 }
 
 void BucketFillTool::clearOverlay()

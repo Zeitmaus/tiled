@@ -45,6 +45,7 @@ public:
     ~BucketFillTool();
 
     void activate(MapScene *scene);
+    void deactivate(MapScene *scene);
 
     void mousePressed(QGraphicsSceneMouseEvent *event);
     void mouseReleased(QGraphicsSceneMouseEvent *event);
@@ -78,6 +79,7 @@ private:
     QRegion mFillRegion;
 
     bool mLastShiftStatus;
+    bool mActive;
 };
 
 } // namespace Internal
