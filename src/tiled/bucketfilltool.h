@@ -48,6 +48,7 @@ public:
 
     void mousePressed(QGraphicsSceneMouseEvent *event);
     void mouseReleased(QGraphicsSceneMouseEvent *event);
+    void mouseMoved(const QPointF &pos, Qt::KeyboardModifiers modifiers);
 
     void modifiersChanged(Qt::KeyboardModifiers);
 
