@@ -20,10 +20,12 @@
 
 #include "eraser.h"
 
+#include "addremovemapobject.h"
 #include "brushitem.h"
 #include "erasetiles.h"
 #include "map.h"
 #include "mapdocument.h"
+#include "mapobjectitem.h"
 #include "mapscene.h"
 #include "tilelayer.h"
 
@@ -37,25 +39,38 @@ Eraser::Eraser(QObject *parent)
                        QKeySequence(tr("E")),
                        parent)
     , mErasing(false)
+    , mMapScene(0)
 {
 }
 
 void Eraser::tilePositionChanged(const QPoint &tilePos)
 {
-    brushItem()->setTileRegion(QRect(tilePos, QSize(1, 1)));
+    if (currentTileLayer()) {
+        brushItem()->setTileRegion(QRect(tilePos, QSize(1, 1)));
 
-    if (mErasing)
-        doErase(true);
+        if (mErasing)
+            doErase(true);
+    }
+}
+
+void Eraser::mouseMoved(const QPointF &pos, Qt::KeyboardModifiers modifiers)
+{
+    AbstractTileTool::mouseMoved(pos, modifiers);
+    if (!currentTileLayer() && mErasing)
+        doEraseItem(pos);
 }
 
 void Eraser::mousePressed(QGraphicsSceneMouseEvent *event)
 {
-    if (!brushItem()->isVisible())
+    if (currentTileLayer() && !brushItem()->isVisible())
         return;
 
     if (event->button() == Qt::LeftButton) {
         mErasing = true;
         doErase(false);
+
+        if (!currentTileLayer())
+            doEraseItem(event->scenePos());
     }
 }
 
@@ -76,7 +91,7 @@ void Eraser::doErase(bool mergeable)
     TileLayer *tileLayer = currentTileLayer();
     const QPoint tilePos = tilePosition();
 
-    if (!tileLayer->bounds().contains(tilePos))
+    if (!tileLayer || !tileLayer->bounds().contains(tilePos))
         return;
 
     QRegion eraseRegion(tilePos.x(), tilePos.y(), 1, 1);
@@ -85,4 +100,28 @@ void Eraser::doErase(bool mergeable)
 
     mapDocument()->undoStack()->push(erase);
     mapDocument()->emitRegionEdited(eraseRegion, tileLayer);
+}
+
+void Eraser::activate(MapScene *mapScene)
+{
+    AbstractTileTool::activate(mapScene);
+    mMapScene = mapScene;
+}
+
+void Eraser::doEraseItem(const QPointF &pos)
+{
+    foreach (QGraphicsItem *item, mMapScene->items(pos)) {
+        if (MapObjectItem *objectItem = dynamic_cast<MapObjectItem*>(item))
+        {
+            RemoveMapObject *erase = new RemoveMapObject(mapDocument(),
+                                                         objectItem->mapObject());
+            mapDocument()->undoStack()->push(erase);
+            return;
+        }
+    }
+}
+
+void Eraser::updateEnabledState()
+{
+    setEnabled(true);
 }

@@ -26,6 +26,8 @@
 namespace Tiled {
 namespace Internal {
 
+class MapObjectItem;
+
 /**
  * Implements a simple eraser tool.
  */
@@ -36,18 +38,26 @@ class Eraser : public AbstractTileTool
 public:
     Eraser(QObject *parent = 0);
 
+    void activate(MapScene *scene);
+
     void mousePressed(QGraphicsSceneMouseEvent *event);
     void mouseReleased(QGraphicsSceneMouseEvent *event);
+    void mouseMoved(const QPointF &pos, Qt::KeyboardModifiers modifiers);
 
     void languageChanged();
 
+    void updateEnabledState();
+
 protected:
     void tilePositionChanged(const QPoint &tilePos);
+    MapObjectItem *topMostObjectItemAt(QPointF pos) const;
 
 private:
     void doErase(bool mergeable);
+    void doEraseItem(const QPointF &pos);
 
     bool mErasing;
+    MapScene *mMapScene;
 };
 
 } // namespace Internal
