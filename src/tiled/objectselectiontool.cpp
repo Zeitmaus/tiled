@@ -35,6 +35,7 @@
 #include <QApplication>
 #include <QGraphicsItem>
 #include <QUndoStack>
+#include <QList>
 
 using namespace Tiled;
 using namespace Tiled::Internal;
@@ -48,6 +49,7 @@ ObjectSelectionTool::ObjectSelectionTool(QObject *parent)
     , mMousePressed(false)
     , mClickedObjectItem(0)
     , mMode(NoMode)
+    , mLastSpecialItem(0)
 {
 }
 
@@ -68,6 +70,13 @@ void ObjectSelectionTool::mouseMoved(const QPointF &pos,
     if (mMode == NoMode && mMousePressed) {
         const int dragDistance = (mStart - pos).manhattanLength();
         if (dragDistance >= QApplication::startDragDistance()) {
+            if (mLastSpecialItem) {
+                // Allows the user to sneak it out properly
+                // after a special selection.  Again, we need
+                // check if we're off in the void.
+                if (objectItemInStack(pos, mLastSpecialItem))
+                    mClickedObjectItem = mLastSpecialItem;
+            }
             if (mClickedObjectItem)
                 startMoving();
             else
@@ -96,8 +105,43 @@ void ObjectSelectionTool::mousePressed(QGraphicsSceneMouseEvent *event)
     case Qt::LeftButton:
         mMousePressed = true;
         mStart = event->scenePos();
-        mClickedObjectItem = topMostObjectItemAt(mStart);
+        if (event->modifiers() & Qt::AltModifier) {
+            // A chunk of polish to keep the user experience solid.
+            if (!mClickedObjectItem && !mLastSpecialItem) {
+                QSet<MapObjectItem *> selSet = mapScene()->selectedObjectItems();
+                if (selSet.count() == 1) {
+                    QList<MapObjectItem *> selList = selSet.toList();
+                    mLastSpecialItem = selList.at(0);
+                }
+            }
+            mClickedObjectItem = sliceIncrement(event->scenePos());
+        } else {
+            mClickedObjectItem = topMostObjectItemAt(mStart);
+        }
         break;
+    case Qt::RightButton:
+        if (mLastSpecialItem) {
+            // IFF we've a valid value we need to ensure that we're
+            // not popping the menu off in the void somewhere.
+            QSet<MapObjectItem *> sel = mapScene()->selectedObjectItems();
+            if (objectItemInStack(event->scenePos(),mLastSpecialItem)) {
+                mClickedObjectItem = mLastSpecialItem;
+            } else {
+                // Since we're in the void, we need give the base class
+                // something valid to chew on.
+                mClickedObjectItem = topMostObjectItemAt(event->scenePos());
+            }
+            //Relies on behaviour in AbstractObjectTool
+            sel.clear();
+            if (mClickedObjectItem) sel.insert(mClickedObjectItem);
+            mapScene()->setSelectedObjectItems(sel);
+
+            // We *must* go around the default implementation or it will
+            // get the idea that it ought grab a fresh selection by
+            // default -- every time.
+            showContextMenu(&*mClickedObjectItem, event->screenPos(), event->widget());
+            return;
+        }
     default:
         AbstractObjectTool::mousePressed(event);
         break;
@@ -108,6 +152,11 @@ void ObjectSelectionTool::mouseReleased(QGraphicsSceneMouseEvent *event)
 {
     if (event->button() != Qt::LeftButton)
         return;
+
+    // Ensure we clear the special selector on the first
+    // invalid click
+    if (!(event->modifiers() & Qt::AltModifier))
+            mLastSpecialItem = 0;
 
     switch (mMode) {
     case NoMode:
@@ -271,4 +320,39 @@ void ObjectSelectionTool::finishMoving(const QPointF &pos)
     mOldObjectItemPositions.clear();
     mOldObjectPositions.clear();
     mMovingItems.clear();
+}
+
+MapObjectItem *ObjectSelectionTool::sliceIncrement(const QPointF &pos)
+{
+    QList<QGraphicsItem *> graphList = mapScene()->items(pos,
+                                                         Qt::IntersectsItemShape,
+                                                         Qt::DescendingOrder);
+    QList<MapObjectItem *> moiList;
+    ObjectGroup *curGroup = currentObjectGroup();
+
+    foreach (QGraphicsItem *qgi, graphList) {
+        //Get the list of stabbed QGraphicsItems in the
+        //current GroupObject.
+        MapObjectItem *moi = dynamic_cast<MapObjectItem *>(qgi);
+        if (moi) {
+            if (curGroup->objects().indexOf(moi->mapObject()) != -1)
+                moiList.append(moi);
+        }
+    }
+
+    if (!moiList.count()) return 0;
+
+    int idx = moiList.indexOf(mLastSpecialItem) + 1;
+    idx %= moiList.count();
+    mLastSpecialItem = moiList.at(idx);
+    return mLastSpecialItem;
+}
+
+bool ObjectSelectionTool::objectItemInStack(const QPointF &pos,
+                                            MapObjectItem *objectItem)
+{
+    QGraphicsItem *tItem = dynamic_cast<QGraphicsItem *>(objectItem);
+    QList<QGraphicsItem *> graphList = mapScene()->items(pos);
+    int index = graphList.indexOf(tItem);
+    return index >= 0;
 }

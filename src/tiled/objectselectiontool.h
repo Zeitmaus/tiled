@@ -65,6 +65,10 @@ private:
                            Qt::KeyboardModifiers modifiers);
     void finishMoving(const QPointF &pos);
 
+    MapObjectItem *sliceIncrement(const QPointF &pos);
+    bool objectItemInStack(const QPointF &pos,
+                           MapObjectItem *objectItem);
+
     SelectionRectangle *mSelectionRectangle;
     bool mMousePressed;
     MapObjectItem *mClickedObjectItem;
@@ -75,6 +79,7 @@ private:
     Mode mMode;
     QPointF mStart;
     Qt::KeyboardModifiers mModifiers;
+    MapObjectItem *mLastSpecialItem;
 };
 
 } // namespace Internal
