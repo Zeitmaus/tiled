@@ -1,4 +1,4 @@
-/*
+ /*
  * tileselectiontool.cpp
  * Copyright 2009-2010, Thorbjørn Lindeijer <thorbjorn@lindeijer.nl>
  *
@@ -93,13 +93,24 @@ void TileSelectionTool::mouseReleased(QGraphicsSceneMouseEvent *event)
         QRegion selection = document->tileSelection();
         const QRect area = selectedArea();
 
+
         switch (mSelectionMode) {
-        case Replace:   selection = area; break;
+        case Replace:   {
+            // Cancel out a sticky selection for a single click-off
+            if (!mLastRegion.isEmpty() &&
+                (area.size() == QSize(1, 1)))
+            {
+                selection = QRegion();
+                brushItem()->setTileRegion(selection);
+            }
+            else selection = area; break;
+        }
         case Add:       selection += area; break;
         case Subtract:  selection -= area; break;
         case Intersect: selection &= area; break;
         }
 
+        mLastRegion = selection;
         if (selection != document->tileSelection()) {
             QUndoCommand *cmd = new ChangeTileSelection(document, selection);
             document->undoStack()->push(cmd);
@@ -125,4 +136,12 @@ QRect TileSelectionTool::selectedArea() const
                      qAbs(tilePos.y() - mSelectionStart.y()) + 1);
 
     return QRect(pos, size);
+}
+
+void TileSelectionTool::mapDocumentChanged(MapDocument *oldDocument,
+                                           MapDocument *newDocument)
+{
+    if (newDocument) mLastRegion = newDocument->tileSelection();
+    else mLastRegion = QRegion();
+    AbstractTileTool::mapDocumentChanged(oldDocument, newDocument);
 }
