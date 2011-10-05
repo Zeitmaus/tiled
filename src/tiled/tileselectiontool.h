@@ -39,6 +39,9 @@ public:
     void languageChanged();
 
 protected:
+    void mapDocumentChanged(MapDocument *oldDocument,
+                            MapDocument *newDocument);
+
     void tilePositionChanged(const QPoint &tilePos);
 
     void updateStatusInfo();
@@ -56,6 +59,7 @@ private:
     QPoint mSelectionStart;
     SelectionMode mSelectionMode;
     bool mSelecting;
+    QRegion mLastRegion;
 };
 
 } // namespace Internal

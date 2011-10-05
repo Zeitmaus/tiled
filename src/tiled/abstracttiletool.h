@@ -58,8 +58,8 @@ public:
     void mouseMoved(const QPointF &pos, Qt::KeyboardModifiers modifiers);
 
 protected:
-    void mapDocumentChanged(MapDocument *oldDocument,
-                            MapDocument *newDocument);
+    virtual void mapDocumentChanged(MapDocument *oldDocument,
+                                    MapDocument *newDocument);
 
     /**
      * Overridden to only enable this tool when the currently selected layer is
